@@ -1,0 +1,62 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Restaurant Rush</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#465064,#171d29 65%);color:#f7f4ed;font-family:system-ui,Arial}.wrap{max-width:1000px;margin:auto;padding:18px}header,.stats,.row,.actions{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}h1{color:#ffc078;margin:0;font-size:clamp(2rem,5vw,3rem)}h2{margin:0 0 10px}.muted{color:#c1cada;line-height:1.5}.stat,.panel{background:#222e40;border:1px solid #50617a;border-radius:15px;padding:14px}.stat b{color:#ffc078}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:15px}.panel{margin-bottom:14px}.customer{background:#4a3d39;border-radius:13px;padding:15px;margin:12px 0}.emoji{font-size:2.4rem;float:left;margin-right:12px}.order{font-size:1.2rem;font-weight:750;color:#fff1d8;margin:8px 0}.chip{display:inline-block;background:#40516a;border-radius:8px;padding:5px 8px;margin:3px;font-size:.85rem}button{border:0;border-radius:9px;padding:10px 13px;background:#ffbd70;color:#202735;font-weight:750;cursor:pointer}button:hover{filter:brightness(1.08)}button:disabled{opacity:.4}.secondary{background:#40536d;color:white}.green{background:#8ce0b5}.field{display:flex;gap:8px;align-items:end;margin:12px 0;flex-wrap:wrap}.field>div{flex:1;min-width:160px}label{display:block;color:#e0e7f0;font-size:.9rem;margin-bottom:5px}input{width:100%;padding:11px;background:#131b28;border:1px solid #71849d;border-radius:9px;color:white;font-size:1rem}.feedback{min-height:24px;color:#9ae8be;font-weight:650;margin:7px 0}.bad{color:#ff9d9d}.menu{display:grid;grid-template-columns:1fr 1fr;gap:8px}.menuitem,.stockrow{background:#303e52;border-radius:10px;padding:9px}.menuitem small,.stockrow small{color:#c1cada}.stockrow{display:flex;justify-content:space-between;align-items:center;margin:7px 0;gap:8px}.log{font-size:.9rem;color:#dbe4ef;line-height:1.5;max-height:180px;overflow:auto}.log div{border-bottom:1px solid #46556a;padding:5px}.bar{height:8px;background:#111b29;border-radius:9px;overflow:hidden;margin:9px 0}.bar span{display:block;height:100%;width:0;background:#8ce0b5}.hidden{display:none!important}.veil{position:fixed;inset:0;background:#080d16dd;display:flex;align-items:center;justify-content:center;padding:18px}.dialog{max-width:520px;background:#26364c;border:1px solid #8294aa;border-radius:17px;padding:22px}footer{text-align:center;color:#aab7c9;font-size:.85rem;margin:16px}@media(max-width:720px){.grid{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<header><div><h1>🍽️ Restaurant Rush</h1><div class="muted">A maths-powered restaurant management adventure</div></div><div class="stats"><div class="stat">💰 Coins <b id="coins">80</b></div><div class="stat">⭐ Reputation <b id="rep">3</b>/5</div><div class="stat">📅 Day <b id="day">1</b></div></div></header>
+<div class="grid"><main>
+<section class="panel"><div class="row"><h2>👩‍🍳 Today's shift</h2><span class="chip" id="round">Customer 1 of 5</span></div><p class="muted" id="goal">Serve five customers, manage supplies and grow your café.</p><div class="bar"><span id="bar"></span></div>
+<div class="customer"><span class="emoji" id="face">🧑‍🎓</span><div class="muted" id="customer">A customer walks in…</div><div class="order" id="order">Your first order is arriving!</div><span class="chip" id="mood">🙂 Patient customer</span><span class="chip" id="deal">🧾 Regular price</span></div>
+<div id="orderStage"><div class="field"><div><label for="total">Step 1 — Calculate unit price × quantity (and discount if shown)</label><input id="total" type="number" inputmode="decimal" placeholder="Bill total in coins"></div><button id="checkTotal">Check bill</button></div><button class="secondary" id="hintTotal">💡 Hint</button><div class="feedback" id="fb1"></div>
+<div id="payStage" class="hidden"><div class="field"><div><label id="payLabel" for="change">Step 2 — Calculate the customer's change</label><input id="change" type="number" inputmode="decimal" placeholder="Change in coins"></div><button id="checkChange">Give change</button></div><button class="secondary" id="hintChange">💡 Hint</button><div class="feedback" id="fb2"></div></div></div>
+<div id="served" class="hidden"><p class="muted" id="servedText"></p><button class="green" id="next">Next customer →</button></div></section>
+<section class="panel"><h2>🧺 Market & supplies</h2><p class="muted">Buy a pack to add three portions to your kitchen stock.</p><div id="market"></div></section>
+</main><aside>
+<section class="panel"><h2>📋 Menu board</h2><div class="menu" id="menu"></div></section>
+<section class="panel"><h2>📦 Kitchen stock</h2><div id="stock"></div></section>
+<section class="panel"><h2>🧾 Shift report</h2><div class="log" id="log"><div>The café is open. Serve your first customer!</div></div></section>
+</aside></div><footer>Mathematics in action: multiplication · subtraction · percentages · budgeting · planning</footer></div>
+<div class="veil" id="welcome"><div class="dialog"><h2>Welcome to Restaurant Rush!</h2><p>You manage a small café. Customers arrive with changing orders. Calculate bills, return the right change, buy supplies and protect your reputation.</p><p><b>Each shift generates new orders, quantities and payment amounts.</b> Later days may include loyalty discounts and changing menu prices.</p><button id="start">Open the café</button></div></div>
+<div class="veil hidden" id="end"><div class="dialog"><h2 id="endTitle">Shift complete!</h2><p id="endText"></p><p class="muted" id="endTip"></p><button id="tomorrow">Start next day →</button></div></div>
+<script>
+const items=[{n:"Sandwich",e:"🥪",p:12,s:7,c:18},{n:"Fruit cup",e:"🍓",p:9,s:6,c:14},{n:"Lemonade",e:"🍋",p:6,s:8,c:9},{n:"Pizza slice",e:"🍕",p:15,s:5,c:22},{n:"Muffin",e:"🧁",p:8,s:6,c:12},{n:"Smoothie",e:"🥤",p:11,s:5,c:17}];
+const people=["Aarav","Meera","Kabir","Tara","Ishaan","Anaya","Dev","Riya","Arjun","Zoya"],faces=["🧑‍🎓","👩‍💼","🧔","👩‍🦰","👨‍🦱","👩‍🎤","🧑‍🍳","👨‍🎓"];
+let coins=80,rep=3,day=1,served=0,order=null,bill=0,history=[];
+const $=x=>document.getElementById(x),rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const fmt=n=>Number.isInteger(n)?String(n):n.toFixed(2);
+function stats(){$("coins").textContent=fmt(coins);$("rep").textContent=rep;$("day").textContent=day;$("round").textContent=`Customer ${Math.min(served+1,5)} of 5`;$("bar").style.width=served*20+"%";drawStock();drawMarket()}
+function drawMenu(){$("menu").innerHTML=items.map(x=>`<div class="menuitem"><b>${x.e} ${x.n}</b><small>${x.p} coins / portion</small></div>`).join("")}
+function drawStock(){$("stock").innerHTML=items.map(x=>`<div class="stockrow"><span>${x.e} ${x.n}</span><b>${x.s}</b></div>`).join("")}
+function drawMarket(){$("market").innerHTML=items.map((x,i)=>`<div class="stockrow"><span>${x.e} ${x.n}<br><small>Pack of 3 · ${x.c} coins</small></span><button onclick="buy(${i})" ${coins<x.c?"disabled":""}>Buy pack</button></div>`).join("")}
+function log(s){history.unshift(s);$("log").innerHTML=history.slice(0,10).map(x=>`<div>${x}</div>`).join("")}
+function buy(i){let x=items[i];if(coins<x.c)return;coins-=x.c;x.s+=3;log(`🛒 Bought 3 ${x.n} portions for ${x.c} coins.`);stats()}
+function nextOrder(){
+ if(served===5){finishDay();return}
+ let choices=items.filter(x=>x.s>0);
+ if(!choices.length){$("order").textContent="Kitchen out of stock! Buy supplies in the market.";return}
+ let p=choices[rand(0,choices.length-1)],q=rand(1,Math.min(3,p.s)),deal=day>=2&&Math.random()<.35;
+ let base=p.p*q,price=deal?base*.9:base;
+ let paid=[price+rand(1,8),Math.ceil(price/10)*10,price+rand(5,20)][rand(0,2)];
+ if(paid<price)paid=price+1;
+ order={p,q,deal,paid,person:people[rand(0,people.length-1)]};bill=price;
+ $("face").textContent=faces[rand(0,faces.length-1)];$("customer").textContent=order.person+" is ready to order";
+ $("order").textContent=`I'd like ${q} ${p.n.toLowerCase()}${q>1?"s":""}, please!`;
+ $("mood").textContent=["🙂 Patient customer","😃 Cheerful customer","🤔 In a hurry"][rand(0,2)];
+ $("deal").textContent=deal?"🏷️ 10% loyalty discount":"🧾 Regular price";
+ $("total").value="";$("change").value="";$("fb1").textContent="";$("fb2").textContent="";
+ $("payStage").classList.add("hidden");$("served").classList.add("hidden");$("orderStage").classList.remove("hidden");stats()
+}
+function checkTotal(){let v=$("total").value;if(v==="")return;let base=order.p.p*order.q,expected=order.deal?base*.9:base;
+ if(Math.abs(Number(v)-expected)<.001){bill=expected;$("fb1").textContent="Correct bill! Now collect the payment.";$("payLabel").textContent=`The customer pays ${fmt(order.paid)} coins. How much change should you return?`;$("payStage").classList.remove("hidden")}
+ else{$("fb1").textContent="Not quite. Multiply price by quantity. If there is a discount, subtract 10%.";$("fb1").classList.add("bad")}}
+function checkChange(){let v=$("change").value;if(v==="")return;let expected=order.paid-bill;
+ if(Math.abs(Number(v)-expected)<.001){$("fb2").textContent="Correct change! Order served.";$("fb2").classList.remove("bad");order.p.s-=order.q;coins+=bill;rep=Math.min(5,rep+1);served++;log(`✅ ${order.person}: ${order.q} × ${order.p.n}; earned ${fmt(bill)} coins.`);$("servedText").textContent=`You received ${fmt(order.paid)} coins, returned ${fmt(expected)} coins and added ${fmt(bill)} coins to the till.`;$("orderStage").classList.add("hidden");$("served").classList.remove("hidden");stats()}
+ else{$("fb2").textContent="Try again: change = amount paid − bill total.";$("fb2").classList.add("bad")}}
+function finishDay(){let bonus=rep>=4?12:rep>=3?6:0;coins+=bonus;$("endTitle").textContent=`🎉 Day ${day} complete!`;$("endText").textContent=`You served ${served} customers and earned a ${bonus}-coin reputation bonus. Your till now has ${fmt(coins)} coins.`;$("endTip").textContent=rep>=4?"Excellent service! Your customers are happy.":"Keep serving accurately and plan your stock before the next shift.";$("end").classList.remove("hidden");stats()}
+function tomorrow(){day++;served=0;items.forEach(x=>x.p=Math.max(1,x.p+(Math.random()<.5?-1:1)));drawMenu();$("goal").textContent=`Day ${day}: some customers may have a 10% loyalty discount. Plan your stock carefully.`;$("end").classList.add("hidden");log(`🌅 Day ${day} begins. Menu prices have been updated.`);stats();nextOrder()}
+$("start").onclick=()=>{$("welcome").classList.add("hidden");drawMenu();stats();nextOrder()};
+$("checkTotal").onclick=checkTotal;$("checkChange").onclick=checkChange;$("next").onclick=nextOrder;$("tomorrow").onclick=tomorrow;
+$("total").onkeydown=e=>{if(e.key==="Enter")checkTotal()};$("change").onkeydown=e=>{if(e.key==="Enter")checkChange()};
+$("hintTotal").onclick=()=>{$("fb1").textContent=`Hint: ${order.p.p} × ${order.q}${order.deal?" ; then subtract 10% of that amount":""}.`};
+$("hintChange").onclick=()=>{$("fb2").textContent=`Hint: ${fmt(order.paid)} − ${fmt(bill)}.`};
+drawMenu();stats();
+</script></body></html>
